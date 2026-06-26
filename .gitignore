@@ -9,3 +9,6 @@
 .DS_Store
 .idea/
 .vscode/
+
+# Claude Code の作業用領域（ミス記録などの一時メモ）
+.claude/workspace/
