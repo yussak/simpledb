@@ -1,0 +1,11 @@
+# ビルド成果物
+/simpledb
+*.exe
+
+# Go
+/vendor/
+
+# エディタ・OS
+.DS_Store
+.idea/
+.vscode/
