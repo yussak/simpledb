@@ -1,0 +1,93 @@
+package engine
+
+import (
+	"simpledb/lexer"
+	"simpledb/parser"
+	"testing"
+)
+
+func setupTestDB() *Database {
+	db := NewDatabase()
+	db.AddTable("users", &Table{
+		Columns: []string{"id", "name"},
+		Rows: [][]string{
+			{"1", "Alice"},
+			{"2", "Bob"},
+		},
+	})
+	return db
+}
+
+func parse(sql string) (parser.Node, error) {
+	tokens := lexer.New(sql).Tokenize()
+	return parser.New(tokens).Parse()
+}
+
+func TestSelectAsterisk(t *testing.T) {
+	db := setupTestDB()
+	node, err := parse("SELECT * FROM users")
+	if err != nil {
+		t.Fatalf("パースエラー: %v", err)
+	}
+
+	result, err := Execute(db, node)
+	if err != nil {
+		t.Fatalf("実行エラー: %v", err)
+	}
+
+	if len(result.Columns) != 2 || result.Columns[0] != "id" || result.Columns[1] != "name" {
+		t.Errorf("Columns: got=%v, want=[id, name]", result.Columns)
+	}
+	if len(result.Rows) != 2 {
+		t.Fatalf("行数: got=%d, want=2", len(result.Rows))
+	}
+	if result.Rows[0][1] != "Alice" || result.Rows[1][1] != "Bob" {
+		t.Errorf("Rows: got=%v", result.Rows)
+	}
+}
+
+func TestSelectColumns(t *testing.T) {
+	db := setupTestDB()
+	node, err := parse("SELECT name FROM users")
+	if err != nil {
+		t.Fatalf("パースエラー: %v", err)
+	}
+
+	result, err := Execute(db, node)
+	if err != nil {
+		t.Fatalf("実行エラー: %v", err)
+	}
+
+	if len(result.Columns) != 1 || result.Columns[0] != "name" {
+		t.Errorf("Columns: got=%v, want=[name]", result.Columns)
+	}
+	if result.Rows[0][0] != "Alice" || result.Rows[1][0] != "Bob" {
+		t.Errorf("Rows: got=%v", result.Rows)
+	}
+}
+
+func TestSelectUnknownTable(t *testing.T) {
+	db := setupTestDB()
+	node, err := parse("SELECT * FROM unknown")
+	if err != nil {
+		t.Fatalf("パースエラー: %v", err)
+	}
+
+	_, err = Execute(db, node)
+	if err == nil {
+		t.Fatal("存在しないテーブルでエラーにならなかった")
+	}
+}
+
+func TestSelectUnknownColumn(t *testing.T) {
+	db := setupTestDB()
+	node, err := parse("SELECT age FROM users")
+	if err != nil {
+		t.Fatalf("パースエラー: %v", err)
+	}
+
+	_, err = Execute(db, node)
+	if err == nil {
+		t.Fatal("存在しないカラムでエラーにならなかった")
+	}
+}
