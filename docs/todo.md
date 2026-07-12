@@ -11,7 +11,7 @@
 ## CREATE TABLE 文
 
 - [x] レキサー: CREATE TABLE 用トークン追加
-- [ ] パーサ: CreateTableStatement
+- [x] パーサ: CreateTableStatement
 - [ ] 実行器: テーブル作成
 
 ## INSERT 文

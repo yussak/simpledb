@@ -12,3 +12,15 @@ type SelectStatement struct {
 }
 
 func (s *SelectStatement) nodeType() string { return "SELECT" }
+
+type CreateStatement struct {
+	ColumnDef []ColumnDef
+	Table     string
+}
+
+func (s *CreateStatement) nodeType() string { return "CREATE" }
+
+type ColumnDef struct {
+	ColumnName string
+	TypeName   string
+}
