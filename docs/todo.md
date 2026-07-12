@@ -24,3 +24,7 @@
 ## end-to-end 検証（Phase 0 ゴール）
 
 - [ ] CREATE → INSERT → SELECT の一連の流れがテストで通る
+
+## メモ（未確定）
+
+- CREATE DATABASE 対応（複数データベースの管理）
