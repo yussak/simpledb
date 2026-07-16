@@ -14,9 +14,23 @@ func Execute(db *Database, node parser.Node) (*Result, error) {
 	switch stmt := node.(type) {
 	case *parser.SelectStatement:
 		return executeSelect(db, stmt)
+	case *parser.CreateStatement:
+		return executeCreate(db, stmt)
 	default:
 		return nil, fmt.Errorf("未対応の文: %T", node)
 	}
+}
+
+func executeCreate(db *Database, stmt *parser.CreateStatement) (*Result, error) {
+	var columns []string
+	for _, col := range stmt.ColumnDef {
+		columns = append(columns, col.ColumnName)
+	}
+	db.AddTable(stmt.Table, &Table{
+		Columns: columns,
+		Rows:    [][]string{},
+	})
+	return nil, nil
 }
 
 func executeSelect(db *Database, stmt *parser.SelectStatement) (*Result, error) {

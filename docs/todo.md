@@ -12,7 +12,7 @@
 
 - [x] レキサー: CREATE TABLE 用トークン追加
 - [x] パーサ: CreateTableStatement
-- [ ] 実行器: テーブル作成
+- [x] 実行器: テーブル作成
 
 ## INSERT 文
 
