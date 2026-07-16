@@ -8,6 +8,10 @@ import (
 var keywords = map[string]TokenType{
 	"SELECT": TOKEN_SELECT,
 	"FROM":   TOKEN_FROM,
+	"CREATE": TOKEN_CREATE,
+	"TABLE":  TOKEN_TABLE,
+	"INT":    TOKEN_INT,
+	"TEXT":   TOKEN_TEXT,
 }
 
 type Lexer struct {
@@ -49,6 +53,14 @@ func (l *Lexer) NextToken() Token {
 		return tok
 	case ';':
 		tok := Token{Type: TOKEN_SEMICOLON, Literal: ";"}
+		l.readChar()
+		return tok
+	case '(':
+		tok := Token{Type: TOKEN_OPEN, Literal: "("}
+		l.readChar()
+		return tok
+	case ')':
+		tok := Token{Type: TOKEN_CLOSE, Literal: ")"}
 		l.readChar()
 		return tok
 	case 0:

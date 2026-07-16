@@ -10,9 +10,9 @@
 
 ## CREATE TABLE 文
 
-- [ ] レキサー: CREATE TABLE 用トークン追加
-- [ ] パーサ: CreateTableStatement
-- [ ] 実行器: テーブル作成
+- [x] レキサー: CREATE TABLE 用トークン追加
+- [x] パーサ: CreateTableStatement
+- [x] 実行器: テーブル作成
 
 ## INSERT 文
 
@@ -24,3 +24,7 @@
 ## end-to-end 検証（Phase 0 ゴール）
 
 - [ ] CREATE → INSERT → SELECT の一連の流れがテストで通る
+
+## メモ（未確定）
+
+- CREATE DATABASE 対応（複数データベースの管理）

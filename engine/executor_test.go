@@ -79,6 +79,30 @@ func TestSelectUnknownTable(t *testing.T) {
 	}
 }
 
+func TestCreateTable(t *testing.T) {
+	db := NewDatabase()
+	node, err := parse("CREATE TABLE users (id INT, name TEXT);")
+	if err != nil {
+		t.Fatalf("パースエラー: %v", err)
+	}
+
+	_, err = Execute(db, node)
+	if err != nil {
+		t.Fatalf("実行エラー: %v", err)
+	}
+
+	table, err := db.GetTable("users")
+	if err != nil {
+		t.Fatalf("テーブルが作成されていない: %v", err)
+	}
+	if len(table.Columns) != 2 || table.Columns[0] != "id" || table.Columns[1] != "name" {
+		t.Errorf("Columns: got=%v, want=[id, name]", table.Columns)
+	}
+	if len(table.Rows) != 0 {
+		t.Errorf("行数: got=%d, want=0", len(table.Rows))
+	}
+}
+
 func TestSelectUnknownColumn(t *testing.T) {
 	db := setupTestDB()
 	node, err := parse("SELECT age FROM users")

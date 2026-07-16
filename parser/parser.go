@@ -19,6 +19,8 @@ func (p *Parser) Parse() (Node, error) {
 	switch tok.Type {
 	case lexer.TOKEN_SELECT:
 		return p.parseSelect()
+	case lexer.TOKEN_CREATE:
+		return p.parseCreate()
 	default:
 		return nil, fmt.Errorf("予期しないトークン: %q", tok.Literal)
 	}
@@ -47,6 +49,82 @@ func (p *Parser) parseSelect() (*SelectStatement, error) {
 	}
 
 	return &SelectStatement{Columns: columns, Table: table}, nil
+}
+
+func (p *Parser) parseCreate() (*CreateStatement, error) {
+	p.advance()
+
+	if err := p.expect(lexer.TOKEN_TABLE); err != nil {
+		return nil, err
+	}
+
+	table, err := p.expectIdent()
+	if err != nil {
+		return nil, err
+	}
+
+	columnDef, err := p.parseColumnsForCreate()
+	if err != nil {
+		return nil, err
+	}
+
+	// セミコロンがあれば消費する（なくてもよい）
+	if p.current().Type == lexer.TOKEN_SEMICOLON {
+		p.advance()
+	}
+
+	return &CreateStatement{ColumnDef: columnDef, Table: table}, nil
+}
+
+// CREATE TABLE users (id INT, name TEXT);
+
+//        CreateTableStatement
+//        /                \
+//     Table            Columns
+//       |             /       \
+//    "users"    ColumnDef    ColumnDef
+//               /     \      /     \
+//            "id"   "INT" "name" "TEXT"
+
+func (p *Parser) parseColumnsForCreate() ([]ColumnDef, error) {
+	if err := p.expect(lexer.TOKEN_OPEN); err != nil {
+		return nil, err
+	}
+
+	var columnDef []ColumnDef
+
+	// 1組目を読む
+	columnName, err := p.expectIdent()
+	if err != nil {
+		return nil, fmt.Errorf("カラム名が必要です: %w", err)
+	}
+	if p.current().Type != lexer.TOKEN_INT && p.current().Type != lexer.TOKEN_TEXT {
+		return nil, fmt.Errorf("型名が必要です: %q", p.current().Literal)
+	}
+	typeName := p.current().Literal
+	p.advance()
+	columnDef = append(columnDef, ColumnDef{ColumnName: columnName, TypeName: typeName})
+
+	// , がある限り繰り返す
+	for p.current().Type == lexer.TOKEN_COMMA {
+		p.advance()
+		columnName, err := p.expectIdent()
+		if err != nil {
+			return nil, fmt.Errorf("カラム名が必要です: %w", err)
+		}
+		if p.current().Type != lexer.TOKEN_INT && p.current().Type != lexer.TOKEN_TEXT {
+			return nil, fmt.Errorf("型名が必要です: %q", p.current().Literal)
+		}
+		typeName := p.current().Literal
+		p.advance()
+		columnDef = append(columnDef, ColumnDef{ColumnName: columnName, TypeName: typeName})
+	}
+
+	if err := p.expect(lexer.TOKEN_CLOSE); err != nil {
+		return nil, err
+	}
+
+	return columnDef, nil
 }
 
 func (p *Parser) parseColumns() ([]string, error) {
