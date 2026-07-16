@@ -62,7 +62,6 @@ func TestInsertNotImplemented(t *testing.T) {
 }
 
 func TestCreateTable(t *testing.T) {
-	// tokens := lexer.New("CREATE TABLE users (id INT);").Tokenize()
 	tokens := lexer.New("CREATE TABLE users (id INT, name TEXT);").Tokenize()
 	node, err := New(tokens).Parse()
 	if err != nil {

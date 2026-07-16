@@ -87,15 +87,6 @@ func (p *Parser) parseCreate() (*CreateStatement, error) {
 //            "id"   "INT" "name" "TEXT"
 
 func (p *Parser) parseColumnsForCreate() ([]ColumnDef, error) {
-	// var columns []string
-	// name, err := p.expectIdent()
-	// if err != nil {
-	// 	return nil, fmt.Errorf("カラム名が必要です: %w", err)
-	// }
-	// columns = append(columns, name)
-
-	// typeも必要になるか
-	// CREATE TABLE users (id INT, name TEXT);
 	if err := p.expect(lexer.TOKEN_OPEN); err != nil {
 		return nil, err
 	}
